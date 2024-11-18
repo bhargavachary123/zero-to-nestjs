@@ -1,6 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
+import * as dotenv from 'dotenv';
+dotenv.config({ path: process.cwd() + '/.env' }); 
+// the cmd method will return the current working directory of the Node.js process.
+// .env.development is a file which i am using for storing environmental variables.
+// if you are using normal .env file, the above import and config steps are not required.
+
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
