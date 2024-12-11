@@ -5,9 +5,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 
 @Controller('product')
 export class ProductController {
-  constructor(
-    private readonly productService: ProductService
-  ) { }
+  constructor(private readonly productService: ProductService) { }
 
   @Post()
   async create(@Body() createProductDto: CreateProductDto) {
@@ -23,7 +21,6 @@ export class ProductController {
   async findOne(@Param('id') id: string) {
     return this.productService.findOne(id);
   }
-
   @Put()
   async update(@Body() updateProductDto: UpdateProductDto) {
     return this.productService.update(updateProductDto);
