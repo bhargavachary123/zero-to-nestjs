@@ -1,25 +1,36 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, PrimaryColumn, UpdateDateColumn } from "typeorm";
+import { Category } from "src/category/entities/category.entity";
+import { Order } from "src/order/entities/order.entity";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, PrimaryColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Product {
-    @PrimaryColumn({ generated: "uuid" }) //it is used to generate primary id, when new data inserted.
-    id:string;
+  @PrimaryColumn({ generated: "uuid" })
+  product_id: string;
 
-    @Column() // It is used to mark a specific class property as a table column
-    name: string;
-  
-    @Column()
-    description: string;
-  
-    @Column({ type: 'decimal' })
-    price: number;
+  @Column()
+  name: string;
 
-    @CreateDateColumn()
-    createdon:Date;
-    
-    @UpdateDateColumn()
-    updatedon:Date;
+  @Column({ type: 'longtext' })
+  description: string
 
-    @DeleteDateColumn()
-    deletedon:Date;
+  @Column()
+  price: number;
+
+  @CreateDateColumn()
+  created_on: Date
+
+  @UpdateDateColumn()
+  updated_on: Date
+
+  @DeleteDateColumn({ nullable: true })
+  deleted_on: Date;
+
+  /* previous relationship if any */
+
+  @ManyToMany(() => Order, order => order.products)
+  orders: Order[];
+
+  @ManyToOne(() => Category, category => category.products)
+  @JoinColumn({ name: 'category_id' })
+  category: Category;
 }

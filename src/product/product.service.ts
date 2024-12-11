@@ -25,7 +25,7 @@ export class ProductService {
   }
 
   async findOne(id: string): Promise<Product> {
-    return this.productRepo.findOneBy({ id: id }) //returning a specific product
+    return this.productRepo.findOneBy({ product_id: id }) //returning a specific product
   }
 
   async update(updateProductDto: UpdateProductDto): Promise<string> {
@@ -34,7 +34,7 @@ export class ProductService {
   }
 
   async remove(id: string): Promise<string> {
-    this.productRepo.delete({ id: id }); //deleting the product
+    this.productRepo.delete({ product_id: id }); //deleting the product
     return "Product deleted successfully";
   }
 }
