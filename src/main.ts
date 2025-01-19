@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import * as dotenv from 'dotenv';
 // import { CustomLogger } from './config/custom.logger';
 import { WinstonLogger } from './config/winston.logger';
+import { ValidationPipe } from '@nestjs/common';
 
 dotenv.config({ path: process.cwd() + '/.env' });
 // the cmd method will return the current working directory of the Node.js process.
@@ -14,6 +15,8 @@ dotenv.config({ path: process.cwd() + '/.env' });
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  // apply global validation to entire application
+  app.useGlobalPipes(new ValidationPipe())
   const configService = app.get(ConfigService);
   const port = configService.get<number>('app.port', 3000);
   await app.listen(port);
