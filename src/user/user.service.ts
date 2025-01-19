@@ -5,6 +5,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { Profile } from './entities/profile.entity';
 import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -15,11 +16,16 @@ export class UserService {
     private profileRepository: Repository<Profile>,
   ) { }
 
+  private async hashString(str: string): Promise<string> {
+    const saltRounds = 10; // Define the cost factor for hashing
+    return await bcrypt.hash(str, saltRounds);
+  }
+
   async create(createUserDto: CreateUserDto) {
     // Create a new User instance
     const user = new User();
     user.name = createUserDto.name;
-    user.password = createUserDto.password;
+    user.password = await this.hashString(createUserDto.password); //encrypt password before insert in database
     user.email = createUserDto.email;
     /*
      * Save the new user to the repository.
@@ -30,7 +36,7 @@ export class UserService {
     // Create a new Profile instance for the user
     const profile = new Profile();
     profile.address = createUserDto.address;
-    profile.phone_number = createUserDto.phoneno;
+    profile.phone_number = await this.hashString(createUserDto.phoneno);
     profile.bio = createUserDto.bio;
     profile.dob = createUserDto.dob;
     profile.user = new_user;  // we can use {user_id:new_user.user_id } as User;  
