@@ -2,6 +2,7 @@ import { Entity, Column, PrimaryColumn, OneToOne, DeleteDateColumn, UpdateDateCo
 import { Profile } from './profile.entity';
 import { Order } from 'src/order/entities/order.entity';
 
+export enum RoleEnum { ADMIN="ADMIN", SELLER="SELLER", CONSUMER="CONSUMER" }
 @Entity()
 export class User {
   @PrimaryColumn({ generated: "uuid" })
@@ -19,6 +20,13 @@ export class User {
   */
   @Column({ select: false })
   password: string;
+
+  @Column({
+    type:'enum',
+    enum: RoleEnum,
+    default: RoleEnum.CONSUMER
+  })
+  role: RoleEnum;
 
   @CreateDateColumn()
   created_on: Date

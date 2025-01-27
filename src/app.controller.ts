@@ -1,6 +1,7 @@
 import { Controller, Get, Ip, Logger, Req } from '@nestjs/common';
 import { AppService } from './app.service';
 import { WinstonLogger } from './config/winston.logger';
+import { SkipAuthGuard } from './auth/skipauth.guard';
 
 @Controller()
 export class AppController {
@@ -10,6 +11,7 @@ export class AppController {
   ) { }
 
   @Get()
+  @SkipAuthGuard()
   getHello(@Ip() Ip: string): string {
     this.winstonlogger.info(`GetHello call from Ip: ${Ip}`);
     return this.appService.getHello();

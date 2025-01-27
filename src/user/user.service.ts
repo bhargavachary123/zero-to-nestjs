@@ -93,4 +93,8 @@ export class UserService {
     await this.userRepository.softDelete({ user_id: id })
     return "User Deleted Successfully";
   }
+
+  async findByEmail(email: string) {
+    return await this.userRepository.findOne({ where: { email: email }, select: { user_id: true, name: true, password: true, role: true } })
+  }
 }

@@ -6,6 +6,7 @@ import * as dotenv from 'dotenv';
 // import { CustomLogger } from './config/custom.logger';
 import { WinstonLogger } from './config/winston.logger';
 import { ValidationPipe } from '@nestjs/common';
+import * as cookieParser from 'cookie-parser';
 
 dotenv.config({ path: process.cwd() + '/.env' });
 // the cmd method will return the current working directory of the Node.js process.
@@ -14,6 +15,7 @@ dotenv.config({ path: process.cwd() + '/.env' });
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  app.use(cookieParser())
 
   // apply global validation to entire application
   app.useGlobalPipes(new ValidationPipe())
