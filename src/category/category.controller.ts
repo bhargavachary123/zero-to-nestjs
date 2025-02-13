@@ -3,6 +3,8 @@ import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { ParseUUIDPipe } from 'src/config/custom/parse-uuid.pipe';
+import { RoleEnum } from 'src/user/entities/user.entity';
+import { Roles } from 'src/auth/role.decorator';
 
 @Controller('category')
 // @UsePipes(new ValidationPipe())  // Apply ValidationPipe at the controller level to validate all incoming requests.
@@ -14,6 +16,7 @@ export class CategoryController {
     * Note: If global validation is not enabled, uncomment the @UsePipes decorator to apply the ValidationPipe locally to validate the incoming DTO.
   */
   // @UsePipes(new ValidationPipe())
+  @Roles(RoleEnum.ADMIN) // Restrict access to only users with the ADMIN role.
   async create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoryService.create(createCategoryDto);
   }
