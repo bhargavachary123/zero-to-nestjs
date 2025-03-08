@@ -1,10 +1,12 @@
-import { Controller, Post, Body, Get, Param, Put, Delete, Req, UsePipes } from '@nestjs/common';
+import { Controller, Post, Body, Get, Param, Put, Delete, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ParseUUIDPipe } from 'src/config/custom/parse-uuid.pipe';
 import { Roles } from 'src/auth/role.decorator';
 import { RoleEnum } from './entities/user.entity';
+import { RolesGuard } from 'src/auth/role.guard';
+import { JwtAuthGuard } from 'src/auth/passport/jwt.guard';
 
 @Controller('user')
 // @UsePipes(new ValidationPipe())  // Apply ValidationPipe at the controller level to validate all incoming requests.
@@ -12,6 +14,7 @@ import { RoleEnum } from './entities/user.entity';
   * Below guard will restricts access to all methods in the controller to only users with the ADMIN role.
   * If you want to restrict access to specific methods, apply the Roles decorator to the specific method.
 */
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class UserController {
   constructor(private readonly userService: UserService) { }
 
