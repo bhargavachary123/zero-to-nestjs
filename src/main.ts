@@ -7,6 +7,7 @@ import * as dotenv from 'dotenv';
 import { WinstonLogger } from './config/winston.logger';
 import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
+import { AllExceptionsFilter } from './config/allexceptions.filter';
 
 dotenv.config({ path: process.cwd() + '/.env' });
 // the cmd method will return the current working directory of the Node.js process.
@@ -19,6 +20,8 @@ async function bootstrap() {
 
   // apply global validation to entire application
   app.useGlobalPipes(new ValidationPipe())
+  app.useGlobalFilters(new AllExceptionsFilter());
+
   const configService = app.get(ConfigService);
   const port = configService.get<number>('app.port', 3000);
   await app.listen(port);
