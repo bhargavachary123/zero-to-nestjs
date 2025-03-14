@@ -1,18 +1,16 @@
-import { Body, Controller, Post, Response } from '@nestjs/common';
-import { LoginDto } from './dto/auth.dto';
+import { Controller, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { SkipAuthGuard } from './skipauth.guard';
+import { LocalAuthGuard } from './passport/local-auth.guard';
 
 @Controller('auth')
 export class AuthController {
     constructor(private readonly authService: AuthService) { }
-    
+
     @Post('login')
-    @SkipAuthGuard()
+    @UseGuards(LocalAuthGuard)
     async login(
-        @Body() loginDto: LoginDto,
-        @Response({ passthrough: true }) res,
+        @Request() req,
     ) {
-        return await this.authService.login(loginDto, res);
+        return await this.authService.login(req.user);
     }
 }
