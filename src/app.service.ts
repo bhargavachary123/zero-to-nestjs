@@ -7,4 +7,7 @@ export class AppService {
   getHello(): string {
     return `Application Name from Custom configurations: ${this.configService.get<string>('app.name')}`;  
   }
+  uploadFile(file:Express.Multer.File): string {
+    return `${file.originalname} File Uploaded Successfully`;
+  }
 }

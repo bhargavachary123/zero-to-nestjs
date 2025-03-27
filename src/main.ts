@@ -8,6 +8,8 @@ import { WinstonLogger } from './config/winston.logger';
 import { ValidationPipe } from '@nestjs/common';
 import * as cookieParser from 'cookie-parser';
 import { AllExceptionsFilter } from './config/allexceptions.filter';
+import { NestExpressApplication } from '@nestjs/platform-express';
+import { join } from 'path';
 
 dotenv.config({ path: process.cwd() + '/.env' });
 // the cmd method will return the current working directory of the Node.js process.
@@ -15,12 +17,16 @@ dotenv.config({ path: process.cwd() + '/.env' });
 // if you are using normal .env file, the above import and config steps are not required.
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.use(cookieParser())
 
   // apply global validation to entire application
   app.useGlobalPipes(new ValidationPipe())
   app.useGlobalFilters(new AllExceptionsFilter());
+
+  app.useStaticAssets(join(__dirname, '..', 'public'), {
+    prefix: '/public/',
+  });
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('app.port', 3000);
