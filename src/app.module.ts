@@ -10,6 +10,7 @@ import { CategoryModule } from './category/category.module';
 import { AuthModule } from './auth/auth.module';
 import { minutes, ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
+import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { APP_GUARD } from '@nestjs/core';
     OrderModule,
     CategoryModule,
     AuthModule,
+    TasksModule,
   ],
   controllers: [AppController],
   providers: [
