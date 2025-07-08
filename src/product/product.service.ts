@@ -1,10 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Product } from './entities/product.entity';
 import { Repository } from 'typeorm';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { CategoryService } from 'src/category/category.service';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Cache } from 'cache-manager';
 
 @Injectable()
 export class ProductService {
@@ -12,6 +14,8 @@ export class ProductService {
     @InjectRepository(Product)
     private readonly productRepo: Repository<Product>,
     private readonly categoryService: CategoryService,
+    @Inject(CACHE_MANAGER)
+    private readonly cacheManager: Cache,
   ) { }
   async create(createProductDto: CreateProductDto) {
     const category = await this.categoryService.findOne(createProductDto.categoryId);
@@ -28,7 +32,13 @@ export class ProductService {
   }
 
   async findAll(): Promise<Product[]> {
-    return await this.productRepo.find(); //returning all the products
+    const value = await this.cacheManager.get<Product[]>('products'); // Check if the value is already cached
+    if (value) {
+      return value; // Return cached value if it exists
+    }
+    const products = await this.productRepo.find(); //returning all the products
+    await this.cacheManager.set('products', products); // Set the value in the cache
+    return products; // Return an empty array if products is null or undefined
   }
 
   async findOne(id: string): Promise<Product> {

@@ -11,17 +11,18 @@ import { AuthModule } from './auth/auth.module';
 import { minutes, ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { TasksModule } from './tasks/tasks.module';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
     MyConfigModule,
     ThrottlerModule.forRoot([
-        {
-          name: 'default', // If name is not provided, the name is given as default
-          ttl: minutes(1), // Time window in minutes
-          limit: 100, // Number of allowed requests in that window
-        }
-      ]),
+      {
+        name: 'default', // If name is not provided, the name is given as default
+        ttl: minutes(1), // Time window in minutes
+        limit: 100, // Number of allowed requests in that window
+      }
+    ]),
     TypeOrmModule.forRoot({
       type: 'mysql', // Specifying the database type as mysql and it also supports mariadb
       // Replace env config names as you defines in file.
@@ -35,6 +36,10 @@ import { TasksModule } from './tasks/tasks.module';
       // Logger settings to log errors and warnings in the ORM.
       logger: 'file',
       logging: ["error"]
+    }),
+    CacheModule.register({
+      isGlobal: true, // Making the cache module global
+      ttl: 5 * 60 * 1000, // Default cache time to live in milliseconds
     }),
     ProductModule,
     UserModule,
