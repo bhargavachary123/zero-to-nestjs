@@ -10,7 +10,8 @@ This document provides a comprehensive overview of the modules in the Zero to Ne
 - **NPM** ≥ 9.8.1 (comes with Node.js)
 - **NestJS framework** 11.x  
   (generated with **@nestjs/cli 11.0.7**)
-
+- **Redis** 7.0.* (for caching)
+- **MySQL** (primary database)
 --- 
 
 ## Table of Contents
@@ -35,7 +36,7 @@ This document provides a comprehensive overview of the modules in the Zero to Ne
 ---
 
 ## Features
-- **In-Memory Caching**: Accelerate your API with efficient in-memory caching.
+- **Redis Caching**: High-performance distributed caching with Redis for API acceleration.
 - **Persistent Dynamic Jobs**: Schedule and manage background jobs (cron, interval, timeout) with persistence.
 - **Background Cron Jobs**: Robust support for recurring and scheduled tasks.
 - **File Uploads & Validation**: Upload single or multiple files, with custom validation for type and size.
@@ -194,6 +195,12 @@ The application implements caching at multiple levels for performance optimizati
 - **Controller-Level Caching**: `@UseInterceptors(CacheInterceptor)` on `ProductController`
 - **Service-Level Caching**: Direct cache interaction in `ProductService` for specific operations
 - **Performance**: Significantly reduces database load for frequently accessed data
+- **Redis Integration**: Uses [`@keyv/redis`](src/app.module.ts) with `cache-manager` for distributed caching
+- **Cache Configuration**:
+  - **Default TTL**: 10 minutes (600,000ms)
+  - **Redis Connection**: Configurable via `REDIS_HOST` and `REDIS_PORT` environment variables
+  - **Fallback**: Defaults to localhost:6379 if environment variables not set
+
 
 ### File Upload System
 

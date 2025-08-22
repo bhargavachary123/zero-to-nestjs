@@ -32,13 +32,15 @@ export class ProductService {
   }
 
   async findAll(): Promise<Product[]> {
-    const value = await this.cacheManager.get<Product[]>('products'); // Check if the value is already cached
+    const value = await this.cacheManager.get<Product[]>('products');
     if (value) {
-      return value; // Return cached value if it exists
+      console.log("Retrieved from cache");
+      return value;
     }
-    const products = await this.productRepo.find(); //returning all the products
-    await this.cacheManager.set('products', products); // Set the value in the cache
-    return products; // Return an empty array if products is null or undefined
+    const products = await this.productRepo.find();
+    await this.cacheManager.set('products', products); //without overriding defalt ttl
+    // await this.cacheManager.set('products', products, 300000); // override defalt ttl
+    return products;
   }
 
   async findOne(id: string): Promise<Product> {

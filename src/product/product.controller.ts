@@ -8,7 +8,7 @@ import { RoleEnum } from 'src/user/entities/user.entity';
 import { CacheInterceptor, CacheKey, CacheTTL } from '@nestjs/cache-manager';
 
 @Controller('product')
-@UseInterceptors(CacheInterceptor)  // Apply to all routes in this controller
+// @UseInterceptors(CacheInterceptor)  // Apply to all routes in this controller
 // @UsePipes(new ValidationPipe())  // Apply ValidationPipe at the controller level to validate all incoming requests.
 export class ProductController {
   constructor(private readonly productService: ProductService) { }
