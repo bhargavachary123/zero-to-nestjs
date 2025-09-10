@@ -6,7 +6,8 @@ import { Repository } from 'typeorm';
 import { UserService } from 'src/user/user.service';
 import { ProductService } from 'src/product/product.service';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { Product } from 'src/product/entities/product.entity';
+import { Queue } from 'bull';
+import { InjectQueue } from '@nestjs/bull';
 
 @Injectable()
 export class OrderService {
@@ -15,6 +16,8 @@ export class OrderService {
     private readonly orderRepo: Repository<Order>,
     private readonly userService: UserService,
     private readonly productService: ProductService,
+    @InjectQueue('order') // 👈 Inject queue
+    private readonly orderQueue: Queue,
   ) { }
 
   async create(createOrderDto: CreateOrderDto): Promise<string> {
@@ -40,11 +43,27 @@ export class OrderService {
     order.total = total;
     order.ordered_on = new Date();
     await this.orderRepo.save(order); // Save the new order to the repository
-    return "Ordered successfully";
+
+    await this.orderQueue.add(
+      'send-confirmation',
+      {
+        orderId: order.order_id,
+        userEmail: user.email,
+      },
+    );
+
+    await this.orderQueue.add(
+      'update-inventory',
+      { productIds: createOrderDto.productIds },
+    );
+
+    return 'Ordered successfully (processing in background)';
   }
 
   async update(updateOrderDto: UpdateOrderDto): Promise<string> {
     const order = await this.orderRepo.findOne({ where: { order_id: updateOrderDto.orderId }, relations: { products: true } })
+    if (!order) return "Order not exists!"
+
     let total: number = 0;
     const new_products = await Promise.all(updateOrderDto.productIds.map(async (productId) => {
       const product = await this.productService.findOne(productId);
@@ -54,12 +73,16 @@ export class OrderService {
         return product;
       }
     }));
-    if (!order)
-      return "Order not exists!"
+
     order.products = new_products;
     order.total = total
     await this.orderRepo.save(order)
-    return "Order updated successfully";
+
+    await this.orderQueue.add('update-inventory', {
+      productIds: updateOrderDto.productIds,
+    });
+
+    return 'Order placed successfully! (processing in background)';
   }
 
   async findAll(): Promise<Order[]> {

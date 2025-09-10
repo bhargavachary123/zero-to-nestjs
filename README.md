@@ -10,7 +10,7 @@ This document provides a comprehensive overview of the modules in the Zero to Ne
 - **NPM** ≥ 9.8.1 (comes with Node.js)
 - **NestJS framework** 11.x  
   (generated with **@nestjs/cli 11.0.7**)
-- **Redis** 7.0.* (for caching)
+- **Redis** 7.0.* (for caching and background queues)
 - **MySQL** (primary database)
 --- 
 
@@ -24,6 +24,7 @@ This document provides a comprehensive overview of the modules in the Zero to Ne
   - [Database Integration](#database-integration)
   - [Authentication & Authorization](#authentication--authorization)
   - [Caching System](#caching-system)
+  - [Background Job Queues (Bull + Redis)](#background-job-queues-bull--redis)
   - [File Upload System](#file-upload-system)
   - [Task Scheduling](#task-scheduling)
   - [Logging System](#logging-system)
@@ -36,6 +37,7 @@ This document provides a comprehensive overview of the modules in the Zero to Ne
 ---
 
 ## Features
+- **Bull-based Job Queues**: Resilient, retryable background job processing for tasks like order confirmation emails and inventory updates, powered by Bull and Redis
 - **Redis Caching**: High-performance distributed caching with Redis for API acceleration.
 - **Persistent Dynamic Jobs**: Schedule and manage background jobs (cron, interval, timeout) with persistence.
 - **Background Cron Jobs**: Robust support for recurring and scheduled tasks.
@@ -141,6 +143,7 @@ The `OrderModule` manages order processing:
 - **Entity Relationships**: Orders are linked to users and products
 - **Service Dependencies**: Integrates with `UserService`, `ProductService`, and `CategoryService`
 - **Complex Relationships**: Manages many-to-many relationships between orders and products
+- **Background Jobs (Bull + Redis)**: Enqueues order-related tasks (e.g., confirmation emails, inventory updates) for asynchronous, retryable processing
 
 ---
 
@@ -201,6 +204,12 @@ The application implements caching at multiple levels for performance optimizati
   - **Redis Connection**: Configurable via `REDIS_HOST` and `REDIS_PORT` environment variables
   - **Fallback**: Defaults to localhost:6379 if environment variables not set
 
+### Background Job Queues (Bull + Redis)
+This project uses Bull, a Redis-backed queue, to handle background processing for tasks such as order confirmation emails and inventory updates.
+#### Benefits:
+- Offloads heavy tasks to background workers, improving API responsiveness.
+- Supports job retries, delays, priorities, and monitoring.
+- Scales horizontally and can run multiple workers in parallel.
 
 ### File Upload System
 
@@ -255,7 +264,10 @@ The application uses a comprehensive logging system based on Winston:
    ```
 2. **Configure environment variables:**
    - Copy `example.env` to `.env` and update the values as needed (database, JWT secret, etc).
-3. **Run the application:**
+3. **Ensure Redis is running:**
+  - Defaults to `localhost:6379` if `REDIS_HOST`/`REDIS_PORT` are not set.
+  - Required for both caching and Bull queues.
+4. **Run the application:**
    ```bash
    # development
    npm run start

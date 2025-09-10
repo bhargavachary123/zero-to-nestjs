@@ -13,6 +13,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { TasksModule } from './tasks/tasks.module';
 import { CacheModule } from '@nestjs/cache-manager';
 import { createKeyv } from '@keyv/redis';
+import { BullModule } from '@nestjs/bull';
 
 @Module({
   imports: [
@@ -46,6 +47,12 @@ import { createKeyv } from '@keyv/redis';
           ttl: 600000, // 10 minutes
         };
       }
+    }),
+    BullModule.forRoot({
+      redis: {
+        host: process.env.REDIS_HOST ?? 'localhost',
+        port: parseInt(process.env.REDIS_PORT ?? '6379'),
+      },
     }),
     ProductModule,
     UserModule,
