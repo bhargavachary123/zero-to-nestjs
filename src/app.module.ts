@@ -53,6 +53,15 @@ import { BullModule } from '@nestjs/bull';
         host: process.env.REDIS_HOST ?? 'localhost',
         port: parseInt(process.env.REDIS_PORT ?? '6379'),
       },
+      // ################################
+      /* Global Queue Configuration */
+      defaultJobOptions: {
+        attempts: 3,
+        backoff: { type: 'exponential', delay: 2000 }, // 2s → 4s → 8s
+        removeOnComplete: true,
+        removeOnFail: false,
+      },
+      // ################################
     }),
     ProductModule,
     UserModule,

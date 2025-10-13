@@ -10,6 +10,11 @@ import * as cookieParser from 'cookie-parser';
 import { AllExceptionsFilter } from './config/allexceptions.filter';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
+import { ExpressAdapter } from '@bull-board/express';
+import { Queue } from 'bull';
+import { createBullBoard } from '@bull-board/api';
+import { BullAdapter } from '@bull-board/api/bullAdapter';
+import { getQueueToken } from '@nestjs/bull';
 
 dotenv.config({ path: process.cwd() + '/.env' });
 // the cmd method will return the current working directory of the Node.js process.
@@ -27,6 +32,21 @@ async function bootstrap() {
   app.useStaticAssets(join(__dirname, '..', 'public'), {
     prefix: '/public/',
   });
+
+  const serverAdapter = new ExpressAdapter()
+  serverAdapter.setBasePath('/bull-board')
+  const orderQueue = app.get<Queue>(getQueueToken('order'));
+
+
+  createBullBoard({
+    queues: [new BullAdapter(orderQueue)],
+    serverAdapter,
+  })
+
+  app.use(
+    '/bull-board',
+    serverAdapter.getRouter()
+  )
 
   const configService = app.get(ConfigService);
   const port = configService.get<number>('app.port', 3000);

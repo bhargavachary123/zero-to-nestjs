@@ -44,17 +44,26 @@ export class OrderService {
     order.ordered_on = new Date();
     await this.orderRepo.save(order); // Save the new order to the repository
 
+    // override global attempts for this specific job
     await this.orderQueue.add(
       'send-confirmation',
       {
         orderId: order.order_id,
         userEmail: user.email,
       },
+      {
+        attempts: 2, // override global attempts
+        priority: 4 // 1 (highest) to 10 (lowest)
+      }
     );
 
+    // advanced retry with backoff
     await this.orderQueue.add(
       'update-inventory',
       { productIds: createOrderDto.productIds },
+      { attempts: 5, 
+        backoff: { type: 'fixed', delay: 10000 }  // fixed 10s delay for retries
+      }
     );
 
     return 'Ordered successfully (processing in background)';
