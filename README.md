@@ -1,5 +1,7 @@
 # Zero to NestJS
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/bhargavachary123/zero-to-nestjs)
+
 This document provides a comprehensive overview of the modules in the Zero to NestJS project, a robust starter project for building scalable, production-ready server-side applications with NestJS.
 
 --- 
